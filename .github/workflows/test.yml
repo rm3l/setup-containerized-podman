@@ -1,0 +1,167 @@
+name: Test Action
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test-basic:
+    name: Basic Setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Containerized Podman
+        id: podman
+        uses: ./
+        with:
+          print-version: 'true'
+
+      - name: Test podman command
+        run: podman info
+
+      - name: Test running a container
+        run: |
+          podman run --rm alpine echo "Hello from Podman!"
+
+      - name: Cleanup
+        if: always()
+        run: docker rm -f ${{ steps.podman.outputs.container-name }}
+
+  test-with-docker-compose:
+    name: With docker-compose
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Containerized Podman
+        id: podman
+        uses: ./
+        with:
+          compose-provider: docker-compose
+          print-version: 'true'
+
+      - name: Test podman command
+        run: podman info
+
+      - name: Test docker-compose with a simple compose file
+        run: |
+          cat > docker-compose.yml << 'EOF'
+          services:
+            hello:
+              image: alpine
+              command: echo "Hello from docker-compose!"
+          EOF
+          docker exec ${{ steps.podman.outputs.container-name }} docker-compose up
+
+      - name: Cleanup
+        if: always()
+        run: docker rm -f ${{ steps.podman.outputs.container-name }}
+
+  test-with-podman-compose:
+    name: With podman-compose
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Containerized Podman
+        id: podman
+        uses: ./
+        with:
+          compose-provider: podman-compose
+          print-version: 'true'
+
+      - name: Test podman command
+        run: podman info
+
+      - name: Test podman-compose with a simple compose file
+        run: |
+          cat > docker-compose.yml << 'EOF'
+          services:
+            hello:
+              image: alpine
+              command: echo "Hello from podman-compose!"
+          EOF
+          docker exec ${{ steps.podman.outputs.container-name }} podman-compose up
+
+      - name: Cleanup
+        if: always()
+        run: docker rm -f ${{ steps.podman.outputs.container-name }}
+
+  test-with-env-vars:
+    name: With environment variables
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Containerized Podman
+        id: podman
+        uses: ./
+        with:
+          env: |
+            MY_VAR=hello
+            ANOTHER_VAR=world
+
+      - name: Verify environment variables
+        run: |
+          docker exec ${{ steps.podman.outputs.container-name }} printenv MY_VAR | grep -q "hello"
+          docker exec ${{ steps.podman.outputs.container-name }} printenv ANOTHER_VAR | grep -q "world"
+          echo "Environment variables are set correctly!"
+
+      - name: Cleanup
+        if: always()
+        run: docker rm -f ${{ steps.podman.outputs.container-name }}
+
+  test-custom-image:
+    name: With custom Podman image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Containerized Podman
+        id: podman
+        uses: ./
+        with:
+          podman-image: 'quay.io/podman/stable:v5.3'
+          print-version: 'true'
+
+      - name: Test podman command
+        run: podman info
+
+      - name: Cleanup
+        if: always()
+        run: docker rm -f ${{ steps.podman.outputs.container-name }}
+
+  test-build-image:
+    name: Build container image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Containerized Podman
+        id: podman
+        uses: ./
+
+      - name: Build a simple container image
+        run: |
+          cat > Containerfile << 'EOF'
+          FROM alpine:latest
+          RUN echo "Built with Podman!" > /message.txt
+          CMD ["cat", "/message.txt"]
+          EOF
+          podman build -t test-image .
+          podman run --rm test-image
+
+      - name: Cleanup
+        if: always()
+        run: docker rm -f ${{ steps.podman.outputs.container-name }}
+

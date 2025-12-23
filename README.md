@@ -1,6 +1,6 @@
 # Setup Containerized Podman Action
 
-This GitHub Action sets up Podman 5.x using a containerized environment with Docker as the backend. It provides a way to use the latest Podman on GitHub Actions runners without dealing with library incompatibilities.
+This GitHub Action sets up Podman using a containerized environment with Docker as the backend. It provides a way to use the latest Podman on GitHub Actions runners without dealing with potential library incompatibilities.
 
 ## How it works
 
@@ -10,7 +10,8 @@ This GitHub Action sets up Podman 5.x using a containerized environment with Doc
 4. Creates a wrapper script at `/usr/local/bin/podman` that proxies commands to the container
 
 This approach:
-- Uses **Podman 5.x** for command parsing and compose orchestration
+
+- Uses **Podman** for command parsing and compose orchestration
 - Uses the **host's Docker daemon** for actual container operations
 - Avoids library incompatibilities when trying to install newer Podman on Ubuntu
 
@@ -23,7 +24,7 @@ steps:
   - uses: actions/checkout@v4
 
   - name: Setup Podman
-    uses: ./.github/actions/setup-containerized-podman
+    uses: @rm3l/setup-containerized-podman
 
   - name: Use Podman
     run: |
@@ -39,7 +40,7 @@ steps:
 
   - name: Setup Podman
     id: podman
-    uses: ./.github/actions/setup-containerized-podman
+    uses: @rm3l/setup-containerized-podman
     with:
       podman-image: quay.io/podman/stable:v5
       docker-compose-version: v5.0.1
@@ -62,7 +63,7 @@ steps:
 
   - name: Setup Podman
     id: podman
-    uses: ./.github/actions/setup-containerized-podman
+    uses: @rm3l/setup-containerized-podman
     with:
       compose-provider: podman-compose
       podman-compose-version: v1.2.0
@@ -85,7 +86,7 @@ steps:
 
   - name: Setup Podman
     id: podman
-    uses: ./.github/actions/setup-containerized-podman
+    uses: @rm3l/setup-containerized-podman
     with:
       env: |
         CORPORATE_PROXY_IMAGE=docker.io/ubuntu/squid:latest
@@ -126,7 +127,7 @@ Don't forget to clean up the Podman container after your workflow. Use the `cont
 ```yaml
 - name: Setup Podman
   id: podman
-  uses: ./.github/actions/setup-containerized-podman
+  uses: @rm3l/setup-containerized-podman
 
 # ... your steps ...
 
@@ -145,4 +146,3 @@ Don't forget to clean up the Podman container after your workflow. Use the `cont
 ## License
 
 Apache-2.0
-
