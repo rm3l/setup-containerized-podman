@@ -120,9 +120,13 @@ runs:
     - name: Display Podman version
       if: ${{ inputs.print-version == 'true' }}
       shell: bash
+      env:
+        COMPOSE_PROVIDER: ${{ inputs.compose-provider }}
       run: |
         echo "*** podman version ***"
         podman version
-        echo
-        echo "*** podman compose version ***"
-        podman compose version
+        if [[ -n "$COMPOSE_PROVIDER" ]]; then
+          echo
+          echo "*** podman compose version ***"
+          podman compose version
+        fi
