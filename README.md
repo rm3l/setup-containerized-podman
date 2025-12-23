@@ -24,7 +24,7 @@ steps:
   - uses: actions/checkout@v4
 
   - name: Setup Podman
-    uses: @rm3l/setup-containerized-podman
+    uses: rm3l/setup-containerized-podman@main
 
   - name: Use Podman
     run: |
@@ -40,7 +40,7 @@ steps:
 
   - name: Setup Podman
     id: podman
-    uses: @rm3l/setup-containerized-podman
+    uses: rm3l/setup-containerized-podman@main
     with:
       podman-image: quay.io/podman/stable:v5
       docker-compose-version: v5.0.1
@@ -63,7 +63,7 @@ steps:
 
   - name: Setup Podman
     id: podman
-    uses: @rm3l/setup-containerized-podman
+    uses: rm3l/setup-containerized-podman@main
     with:
       compose-provider: podman-compose
       podman-compose-version: v1.2.0
@@ -86,7 +86,7 @@ steps:
 
   - name: Setup Podman
     id: podman
-    uses: @rm3l/setup-containerized-podman
+    uses: rm3l/setup-containerized-podman@main
     with:
       env: |
         CORPORATE_PROXY_IMAGE=docker.io/ubuntu/squid:latest
@@ -127,7 +127,7 @@ Don't forget to clean up the Podman container after your workflow. Use the `cont
 ```yaml
 - name: Setup Podman
   id: podman
-  uses: @rm3l/setup-containerized-podman
+  uses: rm3l/setup-containerized-podman@main
 
 # ... your steps ...
 
