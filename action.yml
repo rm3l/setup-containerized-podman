@@ -98,7 +98,7 @@ runs:
         # Install the selected compose provider inside the container (if specified)
         if [ "$COMPOSE_PROVIDER" = "podman-compose" ]; then
           echo "Installing podman-compose $PODMAN_COMPOSE_VERSION inside the container..."
-          docker container exec "$CONTAINER_NAME" sh -c "curl -fsSL https://raw.githubusercontent.com/containers/podman-compose/refs/tags/${PODMAN_COMPOSE_VERSION}/podman_compose.py -o /usr/local/bin/podman-compose && chmod +x /usr/local/bin/podman-compose"
+          docker container exec "$CONTAINER_NAME" sh -c "dnf install -y python3 && curl -fsSL https://raw.githubusercontent.com/containers/podman-compose/refs/tags/${PODMAN_COMPOSE_VERSION}/podman_compose.py -o /usr/local/bin/podman-compose && chmod +x /usr/local/bin/podman-compose"
         elif [ "$COMPOSE_PROVIDER" = "docker-compose" ]; then
           echo "Installing docker-compose $DOCKER_COMPOSE_VERSION inside the container..."
           docker container exec "$CONTAINER_NAME" sh -c "curl -fsSL https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose"
